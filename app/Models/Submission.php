@@ -21,6 +21,7 @@ class Submission extends Model
         'status',
         'execution_time',
         'memory_usage',
+        'score',
     ];
 
     protected $casts = [

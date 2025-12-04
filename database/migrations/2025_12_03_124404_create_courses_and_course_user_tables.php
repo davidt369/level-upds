@@ -13,11 +13,18 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->timestamps(); // Crea created_at y updated_at
-            $table->softDeletes(); // Crea deleted_at para soft-deletes
 
-            // El índice parcial de tu SQL se crea automáticamente en PostgreSQL
-            // con softDeletes(). En otras BD, el índice estándar es suficiente.
+            // Nueva columna created_by
+            $table->unsignedBigInteger('created_by')->nullable();
+
+            $table->timestamps(); // created_at y updated_at
+            $table->softDeletes(); // deleted_at
+
+            // FK: created_by → users.id (ON DELETE SET NULL)
+            $table->foreign('created_by')
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
         });
 
         // 2. Tabla Pivot de Matrículas (course_user)
@@ -26,32 +33,41 @@ return new class extends Migration
 
             // Claves foráneas que se eliminan en cascada
             $table->foreignId('course_id')
-                  ->constrained('courses') // Referencia a la tabla 'courses'
-                  ->onDelete('cascade');
+                ->constrained('courses')
+                ->onDelete('cascade');
 
             $table->foreignId('user_id')
-                  ->constrained('users') // Referencia a la tabla 'users'
-                  ->onDelete('cascade');
+                ->constrained('users')
+                ->onDelete('cascade');
 
-            // Usamos ENUM en lugar de VARCHAR + CHECK, es más idiomático en Laravel
             $table->enum('role', ['teacher', 'student']);
 
             $table->timestamp('created_at')->useCurrent();
 
-            // Restricción única para evitar duplicados
+            // Evita duplicados
             $table->unique(['course_id', 'user_id', 'role']);
         });
+
+        // 3. Índice compuesto en activities (course_id, weight)
+        // Solo si la tabla activities ya existe (no rompe migraciones iniciales)
+        if (Schema::hasTable('activities')) {
+            Schema::table('activities', function (Blueprint $table) {
+                $table->index(['course_id', 'weight'], 'idx_activity_weight');
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        // Se debe eliminar primero la tabla que tiene las claves foráneas
+        // Eliminar índice si existe
+        if (Schema::hasTable('activities')) {
+            Schema::table('activities', function (Blueprint $table) {
+                $table->dropIndex('idx_activity_weight');
+            });
+        }
+
         Schema::dropIfExists('course_user');
+
         Schema::dropIfExists('courses');
     }
 };

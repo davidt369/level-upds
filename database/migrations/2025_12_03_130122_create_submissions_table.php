@@ -19,11 +19,12 @@ return new class extends Migration
         Schema::create('submissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('problem_id')
-                  ->constrained('problems')
-                  ->onDelete('cascade');
+                ->constrained('problems')
+                ->onDelete('cascade');
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->onDelete('cascade');
+                ->constrained('users')
+                ->onDelete('cascade');
+            $table->integer('score ')->default(0);
             $table->enum('language', ['cpp', 'python', 'php', 'node', 'csharp', 'java']);
             $table->text('code_url'); // URL a S3/MinIO donde se almacena el código
             $table->enum('status', [

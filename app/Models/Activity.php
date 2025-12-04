@@ -19,6 +19,7 @@ class Activity extends Model
         'description',
         'start_time',
         'end_time',
+        'weight',
     ];
 
     protected $casts = [

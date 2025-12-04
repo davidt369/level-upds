@@ -17,12 +17,13 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('course_id')
-                  ->constrained('courses')
-                  ->onDelete('cascade');
+                ->constrained('courses')
+                ->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->timestamp('start_time');
             $table->timestamp('end_time');
+            $table->integer('weight')->default(100); // Peso de la actividad en la calificación final
             $table->timestamps();
             $table->softDeletes();
 
