@@ -9,7 +9,7 @@ export default function RegisterPage() {
                 <div className="flex justify-center gap-2 md:justify-start">
                     <Link href="/" className="flex items-center gap-2 font-medium">
                         <Image
-                            src="/upds-logo.png"
+                            src="/bg-upds.png"
                             alt="Logo"
                             width={32}
                             height={32}
@@ -25,10 +25,9 @@ export default function RegisterPage() {
             </div>
             <div className="bg-muted relative hidden lg:block">
                 <Image
-                    src="/auth-bg.png"
+                    src="/bg-upds.png"
                     alt="Level UPDS Background"
                     fill
-                    className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.4]"
                 />
             </div>
         </div>
