@@ -35,7 +35,7 @@ export default async function ActivityPage({ params }: { params: Promise<{ cours
 
     if (activity.tipo === 'code') {
         return (
-            <div className="h-[calc(100vh-9rem)]">
+            <div id="programming-view" className="h-[calc(100vh-9rem)]">
                 <ProgrammingActivityView
                     activity={activity}
                     submissions={submissions}

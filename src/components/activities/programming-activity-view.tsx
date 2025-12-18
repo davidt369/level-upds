@@ -32,7 +32,8 @@ export function ProgrammingActivityView({ activity, submissions, isCompleted = f
     const [code, setCode] = useState(initialCode);
     const [language, setLanguage] = useState(initialLanguage);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [activeTab, setActiveTab] = useState("instructions"); // Default tab
+    const [activeTab, setActiveTab] = useState("instructions");
+    const [processingStatus, setProcessingStatus] = useState<string>("");
     const router = useRouter();
 
     const handleSubmit = async () => {
@@ -42,32 +43,143 @@ export function ProgrammingActivityView({ activity, submissions, isCompleted = f
         }
 
         setIsSubmitting(true);
+        setProcessingStatus("Enviando código...");
+
         try {
             // Apply template before submitting
             const fullCode = applyTemplate(code, language);
+
+            // Step 1: Create submission in DB and get test cases
             const result = await submitSolution(activity.id, fullCode, language);
+
             if (result.error) {
                 toast.error(result.error);
-            } else {
-                toast.success("Solución enviada correctamente");
-                if (result.submission) {
-                    setSubmissionState(result.submission);
-                    setActiveTab("results"); // Switch to results tab
+                setIsSubmitting(false);
+                return;
+            }
+
+            const { submissionId, testCases, languageId, tiempoLimite, totalPoints, activityId, courseId } = result;
+
+            toast.success("Código enviado. Ejecutando casos de prueba...");
+            setActiveTab("results");
+            setProcessingStatus("Ejecutando casos de prueba...");
+
+            // Step 2: Execute test cases via API
+            const results: any[] = [];
+            let completedCases = 0;
+
+            for (const testCase of (testCases as any[] || [])) {
+                setProcessingStatus(`Ejecutando caso ${completedCases + 1}/${(testCases as any[]).length}...`);
+
+                // Submit to Judge0
+                const submitRes = await fetch("/api/judge0/submit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        source_code: fullCode,
+                        language_id: languageId,
+                        stdin: testCase.input,
+                        expected_output: testCase.expected,
+                        cpu_time_limit: tiempoLimite ? tiempoLimite / 1000 : 2,
+                    }),
+                });
+
+                if (!submitRes.ok) {
+                    results.push({
+                        input: testCase.input,
+                        expected: testCase.expected,
+                        status: "Error",
+                        message: "Failed to submit to Judge0",
+                    });
+                    completedCases++;
+                    continue;
                 }
+
+                const { token } = await submitRes.json();
+
+                // Poll for result
+                let pollResult: any = null;
+                let attempts = 0;
+                const maxAttempts = 15;
+
+                while (attempts < maxAttempts) {
+                    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                    const resultRes = await fetch(`/api/judge0/result/${token}`);
+                    if (!resultRes.ok) break;
+
+                    const data = await resultRes.json();
+
+                    if (data.status?.id >= 3) {
+                        pollResult = data;
+                        break;
+                    }
+                    attempts++;
+                }
+
+                if (!pollResult) {
+                    results.push({
+                        input: testCase.input,
+                        expected: testCase.expected,
+                        status: "Timeout",
+                        message: "Execution timeout",
+                    });
+                } else {
+                    results.push({
+                        input: testCase.input,
+                        expected: testCase.expected,
+                        actual: pollResult.stdout,
+                        status: pollResult.status.description,
+                        time: pollResult.time,
+                        memory: pollResult.memory,
+                        stderr: pollResult.stderr,
+                        compile_output: pollResult.compile_output,
+                    });
+                }
+
+                completedCases++;
+            }
+
+            // Step 3: Update submission with results
+            setProcessingStatus("Guardando resultados...");
+
+            const { updateSubmissionResults } = await import("@/actions/update-submission-actions");
+            const updateResult = await updateSubmissionResults(
+                submissionId!,
+                results,
+                totalPoints!,
+                activityId!,
+                courseId!
+            );
+
+            if (updateResult.error) {
+                toast.error(updateResult.error);
+            } else {
+                toast.success(`Evaluación completa: ${updateResult.score}/${totalPoints} puntos`);
+                setSubmissionState({
+                    id: submissionId,
+                    estado: updateResult.status,
+                    puntuacion: updateResult.score,
+                    resultado: results,
+                    lenguaje: language,
+                    codigoFuente: fullCode,
+                    createdAt: new Date(),
+                });
                 router.refresh();
             }
         } catch (error) {
             console.error(error);
-            toast.error("Error crítico al procesar el envío. Por favor intenta nuevamente.");
+            toast.error("Error al procesar el envío");
         } finally {
             setIsSubmitting(false);
+            setProcessingStatus("");
         }
     };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 h-full ">
             {/* Editor Column (60%) */}
-            <div className="lg:col-span-3 flex flex-col h-full space-y-4 order-2 lg:order-1">
+            <div id="code-editor-wrapper" className="lg:col-span-3 flex flex-col h-full space-y-4 order-2 lg:order-1">
                 <CodeEditor
                     language={language}
                     value={code}
@@ -85,9 +197,9 @@ export function ProgrammingActivityView({ activity, submissions, isCompleted = f
                     className="flex-1 min-h-0"
                 />
                 <div className="flex justify-end">
-                    <Button onClick={handleSubmit} disabled={isSubmitting || isCompleted}>
+                    <Button id="submit-solution-btn" onClick={handleSubmit} disabled={isSubmitting || isCompleted}>
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isCompleted ? "Actividad Completada" : "Enviar Solución"}
+                        {isSubmitting ? (processingStatus || "Enviando...") : isCompleted ? "Actividad Completada" : "Enviar Solución"}
                     </Button>
                 </div>
             </div>
@@ -97,14 +209,16 @@ export function ProgrammingActivityView({ activity, submissions, isCompleted = f
                 <Card className="flex-1 flex flex-col overflow-hidden border-border bg-card/50">
                     <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col h-full overflow-hidden">
                         <div className="px-6 pt-6 border-b bg-background/50 backdrop-blur-sm z-10 shrink-0">
-                            <TabsList className="w-full justify-start h-10 bg-transparent p-0 border-b border-transparent">
+                            <TabsList id="activity-tabs-list" className="w-full justify-start h-10 bg-transparent p-0 border-b border-transparent">
                                 <TabsTrigger
+                                    id="tab-instructions"
                                     value="instructions"
                                     className="data-[state=active]:bg-background/80 data-[state=active]:shadow-sm rounded-t-lg border border-transparent data-[state=active]:border-border border-b-0 px-4 py-2"
                                 >
                                     Instrucciones
                                 </TabsTrigger>
                                 <TabsTrigger
+                                    id="tab-results"
                                     value="results"
                                     disabled={!submissionState}
                                     className="data-[state=active]:bg-background/80 data-[state=active]:shadow-sm rounded-t-lg border border-transparent data-[state=active]:border-border border-b-0 px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -115,7 +229,7 @@ export function ProgrammingActivityView({ activity, submissions, isCompleted = f
                         </div>
 
                         {/* TAB: INSTRUCCIONES */}
-                        <TabsContent value="instructions" className="flex-1 overflow-y-auto p-6 gap-6 flex flex-col m-0 outline-none">
+                        <TabsContent id="tab-content-instructions" value="instructions" className="flex-1 overflow-y-auto p-6 gap-6 flex flex-col m-0 outline-none">
                             <div className="space-y-4 shrink-0">
                                 <div className="flex justify-between items-start">
                                     <h2 className="text-2xl font-bold leading-tight">{activity.titulo}</h2>
@@ -147,7 +261,7 @@ export function ProgrammingActivityView({ activity, submissions, isCompleted = f
 
                             {/* Example Test Case Section */}
                             {activity.programmingActivity?.casosPrueba && activity.programmingActivity.casosPrueba.length > 0 && (
-                                <div className="rounded-lg border bg-muted/40 p-4">
+                                <div id="example-test-case" className="rounded-lg border bg-muted/40 p-4">
                                     <div className="flex items-center gap-2 mb-3">
                                         <Badge variant="outline" className="bg-background">Ejemplo</Badge>
                                         <h4 className="text-sm font-semibold">Entrada y Salida</h4>

@@ -78,7 +78,7 @@ export function RegisterForm() {
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="tu@email.com" {...field} disabled={isPending} />
+                                    <Input placeholder="cb.juan.perez.m@upds.net.bo" {...field} disabled={isPending} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -97,7 +97,7 @@ export function RegisterForm() {
                             </FormItem>
                         )}
                     />
-                    <FormField
+                    {/* <FormField
                         control={form.control}
                         name="role"
                         render={({ field }) => (
@@ -118,7 +118,7 @@ export function RegisterForm() {
                                 <FormMessage />
                             </FormItem>
                         )}
-                    />
+                    /> */}
                     <Button type="submit" className="w-full" disabled={isPending}>
                         {isPending ? "Registrando..." : "Registrarse"}
                     </Button>

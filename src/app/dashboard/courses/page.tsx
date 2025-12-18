@@ -8,7 +8,7 @@ export default async function CoursesPage() {
 
     return (
         <section className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div id="courses-header" className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Gestión de Cursos</h2>
                     <p className="text-muted-foreground">Crea y administra tus cursos.</p>
@@ -16,16 +16,18 @@ export default async function CoursesPage() {
                 <CourseDialog />
             </div>
 
-            <DataTable
-                columns={columns}
-                data={courses}
-                filterColumn="estado"
-                filterOptions={[
-                    { label: "Activo", value: "activo" },
-                    { label: "Inactivo", value: "inactivo" },
-                    { label: "Archivado", value: "archivado" },
-                ]}
-            />
+            <div id="courses-table">
+                <DataTable
+                    columns={columns}
+                    data={courses}
+                    filterColumn="estado"
+                    filterOptions={[
+                        { label: "Activo", value: "activo" },
+                        { label: "Inactivo", value: "inactivo" },
+                        { label: "Archivado", value: "archivado" },
+                    ]}
+                />
+            </div>
         </section>
     )
 }

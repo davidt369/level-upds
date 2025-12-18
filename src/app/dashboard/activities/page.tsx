@@ -20,14 +20,14 @@ export default async function ActivitiesPage() {
 
     return (
         <div className="space-y-6 container mx-auto py-6">
-            <div className="flex flex-col gap-2">
+            <div id="activities-header" className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold tracking-tight">Mis Actividades</h1>
                 <p className="text-muted-foreground">
                     Gestiona tus tareas pendientes y revisa tu historial de aprendizaje.
                 </p>
             </div>
 
-            <Tabs defaultValue="pending" className="w-full">
+            <Tabs id="activities-tabs" defaultValue="pending" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
                     <TabsTrigger value="pending">Pendientes ({pendingActivities.length})</TabsTrigger>
                     <TabsTrigger value="history">Historial ({historyActivities.length})</TabsTrigger>

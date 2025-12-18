@@ -16,20 +16,22 @@ export default async function UsersPage() {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div id="users-header" className="flex items-center justify-between">
                 <h2 className="text-3xl font-bold tracking-tight">Gestión de Usuarios</h2>
                 <UserDialog />
             </div>
-            <DataTable
-                columns={columns}
-                data={users}
-                filterColumn="role"
-                filterOptions={[
-                    { label: "Estudiante", value: "student" },
-                    { label: "Profesor", value: "teacher" },
-                    { label: "Administrador", value: "admin" },
-                ]}
-            />
+            <div id="users-table">
+                <DataTable
+                    columns={columns}
+                    data={users}
+                    filterColumn="role"
+                    filterOptions={[
+                        { label: "Estudiante", value: "student" },
+                        { label: "Profesor", value: "teacher" },
+                        { label: "Administrador", value: "admin" },
+                    ]}
+                />
+            </div>
         </div>
     );
 }

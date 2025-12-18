@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_BO",
-    url: "https://levelupds.edu.bo",
+    url: "https://level-upds.vercel.app",
     title: "Level UPDS - Plataforma de Evaluación Automática",
     description:
       "Moderniza el aprendizaje de programación con retroalimentación instantánea y entornos estandarizados.",

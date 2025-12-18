@@ -18,10 +18,12 @@ import { useTransition, useState } from "react";
 import { authenticate } from "@/actions/auth-actions";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm() {
     const [isPending, startTransition] = useTransition();
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -44,7 +46,8 @@ export function LoginForm() {
                     toast.error(result);
                 } else {
                     toast.success("Login exitoso");
-                    // El redirect debería manejarse en el servidor con auth.js
+                    router.push("/dashboard");
+                    router.refresh(); // Ensure the layout updates with the new session
                 }
             } catch (error) {
                 toast.error("Error en la conexión");

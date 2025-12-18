@@ -167,9 +167,9 @@ export function ActivityDialog({ courseId, activityToEdit, open: controlledOpen,
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="theory">
+                                                {/* <SelectItem value="theory">
                                                     <div className="flex items-center"><FileText className="mr-2 h-4 w-4" /> Teórica</div>
-                                                </SelectItem>
+                                                </SelectItem> */}
                                                 <SelectItem value="code">
                                                     <div className="flex items-center"><Code className="mr-2 h-4 w-4" /> Programación</div>
                                                 </SelectItem>

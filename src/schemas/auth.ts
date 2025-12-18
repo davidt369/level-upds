@@ -15,6 +15,8 @@ export const RegisterSchema = z.object({
   }),
   email: z.string().email({
     message: "Email inválido",
+  }).regex(/^cb\..+@upds\.net\.bo$/, {
+    message: "El correo debe tener el formato cb.nombre.apellido.inicial@upds.net.bo",
   }),
   password: z.string().min(6, {
     message: "La contraseña debe tener al menos 6 caracteres",

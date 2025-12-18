@@ -4,6 +4,8 @@ import { DashboardClientLayout } from "@/components/dashboard/dashboard-layout-c
 import type { Metadata } from "next"
 import { UserButton } from "@/components/auth/user-button";
 import { ModeToggle } from "@/components/ui/mode-toggle";
+import { TourGuide } from "@/components/dashboard/tour-guide";
+
 export const metadata: Metadata = {
     title: {
         default: "Level UPDS - Evaluación Automática de Programación",
@@ -46,7 +48,7 @@ export const metadata: Metadata = {
     openGraph: {
         type: "website",
         locale: "es_BO",
-        url: "https://levelupds.edu.bo",
+        url: "https://level-upds.vercel.app",
         title: "Level UPDS - Plataforma de Evaluación Automática",
         description:
             "Moderniza el aprendizaje de programación con retroalimentación instantánea y entornos estandarizados.",
@@ -79,6 +81,7 @@ export default async function DashboardLayout({
             }}
             actions={
                 <div className="ml-auto flex items-center space-x-2">
+                    <TourGuide role={session.user.role} />
                     <ModeToggle />
                     <UserButton />
                 </div>

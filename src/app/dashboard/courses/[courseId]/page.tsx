@@ -33,7 +33,7 @@ export default async function CourseDetailsPage({ params }: { params: Promise<{ 
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div id="course-detail-header" className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">Detalles del Curso</h2>
                     <p className="text-muted-foreground">Gestiona actividades y revisa el progreso.</p>
@@ -43,10 +43,12 @@ export default async function CourseDetailsPage({ params }: { params: Promise<{ 
                    We should update ActivityDialog to accept isAdmin or handle it there.
                    For now, let's just pass isCourseExpired. The dialog is the one disabling the button.
                 */}
-                <ActivityDialog courseId={courseId} isCourseExpired={!!isCourseExpired && !isAdmin} />
+                <div id="create-activity-button">
+                    <ActivityDialog courseId={courseId} isCourseExpired={!!isCourseExpired && !isAdmin} />
+                </div>
             </div>
 
-            <Tabs defaultValue="content" className="w-full">
+            <Tabs id="course-tabs" defaultValue="content" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
                     <TabsTrigger value="content">Contenido</TabsTrigger>
                     <TabsTrigger value="leaderboard">Ranking</TabsTrigger>
@@ -111,7 +113,7 @@ export default async function CourseDetailsPage({ params }: { params: Promise<{ 
                 </TabsContent>
 
                 <TabsContent value="leaderboard" className="mt-6">
-                    <Card>
+                    <Card id="course-leaderboard">
                         <CardHeader>
                             <CardTitle>Ranking del Curso</CardTitle>
                             <CardDescription>

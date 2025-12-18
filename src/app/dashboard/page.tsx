@@ -39,12 +39,12 @@ function StudentDashboardView({ data, userName }: { data: any, userName?: string
     return (
         <div className="space-y-8">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">¡Hola, {userName?.split(' ')[0]}!</h2>
+                <h2 id="dashboard-welcome" className="text-3xl font-bold tracking-tight">¡Hola, {userName?.split(' ')[0]}!</h2>
                 <p className="text-muted-foreground">Aquí tienes un resumen de tu progreso.</p>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-3">
+            <div id="student-stats" className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Cursos Inscritos</CardTitle>
@@ -75,7 +75,7 @@ function StudentDashboardView({ data, userName }: { data: any, userName?: string
             </div>
 
             {/* Upcoming Deadlines */}
-            <div className="space-y-4">
+            <div id="upcoming-deadlines" className="space-y-4">
                 <h3 className="text-xl font-semibold flex items-center gap-2">
                     <Clock className="h-5 w-5 text-yellow-600" />
                     Vencen Pronto
@@ -124,12 +124,12 @@ function TeacherDashboardView({ data, userName }: { data: any, userName?: string
     return (
         <div className="space-y-8">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">Bienvenido, Profe {userName?.split(' ')[0]}</h2>
+                <h2 id="teacher-welcome" className="text-3xl font-bold tracking-tight">Bienvenido, Profe {userName?.split(' ')[0]}</h2>
                 <p className="text-muted-foreground">Gestión académica y seguimiento.</p>
             </div>
 
             {/* Stats Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+            <div id="teacher-stats" className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Cursos Activos</CardTitle>
@@ -151,7 +151,7 @@ function TeacherDashboardView({ data, userName }: { data: any, userName?: string
             </div>
 
             {/* Recent Activities */}
-            <div className="space-y-4">
+            <div id="recent-activities" className="space-y-4">
                 <h3 className="text-xl font-semibold">Actividades Creadas Recientemente</h3>
                 <div className="rounded-md border bg-card">
                     {recentActivities.map((activity: any, index: number) => (

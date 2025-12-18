@@ -87,7 +87,7 @@ export function CodeEditor({
                     <div className="h-4 w-[1px] bg-[#333]" />
 
                     <Select disabled={readOnly} value={language} onValueChange={onLanguageChange}>
-                        <SelectTrigger className="w-[140px] h-8 bg-[#252525] border-[#333] text-gray-200 focus:ring-0 focus:ring-offset-0 hover:bg-[#2a2a2a] transition-colors">
+                        <SelectTrigger id="language-selector" className="w-[140px] h-8 bg-[#252525] border-[#333] text-gray-200 focus:ring-0 focus:ring-offset-0 hover:bg-[#2a2a2a] transition-colors">
                             <SelectValue placeholder="Lenguaje" />
                         </SelectTrigger>
                         <SelectContent className="bg-[#1e1e1e] border-[#333] text-gray-200">
